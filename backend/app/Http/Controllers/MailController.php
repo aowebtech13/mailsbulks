@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Mail\BulkMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Config;
+use App\Jobs\SendBulkEmailJob;
 
 class MailController extends Controller
 {
@@ -21,8 +22,7 @@ class MailController extends Controller
             'body' => 'required',
         ]);
 
-        // Configure mailer dynamically
-        Config::set('mail.mailers.dynamic_smtp', [
+        $smtpConfig = [
             'transport' => 'smtp',
             'host' => $request->smtp_host,
             'port' => $request->smtp_port,
@@ -31,9 +31,7 @@ class MailController extends Controller
             'password' => $request->smtp_pass,
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN'),
-        ]);
-
-        Config::set('mail.default', 'dynamic_smtp');
+        ];
 
         $headers = [];
         if ($request->has('headers_list')) {
@@ -44,32 +42,21 @@ class MailController extends Controller
             }
         }
 
-        $results = [];
         foreach ($request->recipients as $recipient) {
-            try {
-                // Educational note: Spoofing is achieved by setting a 'from' address 
-                // different from the authenticated SMTP user. 
-                // Many SMTP servers will reject this or add a 'Sender' header.
-                $mailData = [
-                    'subject' => $request->subject,
-                    'body' => $request->body,
-                    'from' => $request->from_email ?? $request->smtp_user,
-                    'headers' => $headers
-                ];
+            $mailData = [
+                'subject' => $request->subject,
+                'body' => $request->body,
+                'from' => $request->from_email ?? $request->smtp_user,
+                'headers' => $headers
+            ];
 
-                // Educational note: To "bypass" some security filters (like rate limiting), 
-                // developers often implement delays (sleep) or rotate between multiple 
-                // SMTP servers. This project demonstrated dynamic configuration.
-                // sleep(1); // Basic rate limiting bypass technique
-                
-                Mail::to($recipient)->send(new BulkMail($mailData));
-                
-                $results[] = ['email' => $recipient, 'status' => 'success'];
-            } catch (\Exception $e) {
-                $results[] = ['email' => $recipient, 'status' => 'failed', 'error' => $e->getMessage()];
-            }
+            // Dispatch to queue for efficiency
+            SendBulkEmailJob::dispatch($recipient, $mailData, $smtpConfig);
         }
 
-        return response()->json(['results' => $results]);
+        return response()->json([
+            'message' => 'Email sending process started. All emails have been queued.',
+            'count' => count($request->recipients)
+        ]);
     }
 }

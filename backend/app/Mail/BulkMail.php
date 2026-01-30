@@ -40,7 +40,11 @@ class BulkMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            htmlString: $this->mailData['body'] ?? '',
+            view: 'emails.bulk',
+            with: [
+                'subject' => $this->mailData['subject'] ?? 'Bulk Mail',
+                'body' => $this->mailData['body'] ?? '',
+            ]
         );
     }
 

@@ -16,7 +16,7 @@ function App() {
     headers_list: []
   })
   const [loading, setLoading] = useState(false)
-  const [results, setResults] = useState(null)
+  const [statusMessage, setStatusMessage] = useState(null)
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -26,13 +26,13 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
-    setResults(null)
+    setStatusMessage(null)
     try {
       const response = await axios.post('http://localhost:8000/api/send-bulk', {
         ...formData,
         recipients: formData.recipients.split('\n').map(email => email.trim()).filter(email => email !== '')
       })
-      setResults(response.data.results)
+      setStatusMessage(response.data.message)
     } catch (error) {
       alert('Error sending emails: ' + (error.response?.data?.message || error.message))
     } finally {
@@ -41,8 +41,19 @@ function App() {
   }
 
   return (
-    <div className="container">
-      <h1>Bulk Email Sender (Educational)</h1>
+    <div className="layout-wrapper">
+      <div className="side-image">
+        <img src="https://res.cloudinary.com/djme9spdc/image/upload/v1681139870/samples/ecommerce/leather-bag-gray.jpg" alt="Bulk Mail" />
+      </div>
+      <div className="container">
+        <h1>Bulk Email Sender (Educational)</h1>
+
+        {statusMessage && (
+          <div className="section" style={{ backgroundColor: 'var(--light-green)', border: '1px solid var(--primary-green)' }}>
+            <p style={{ color: 'var(--dark-green)', fontWeight: 'bold', margin: 0 }}>{statusMessage}</p>
+          </div>
+        )}
+
       <form onSubmit={handleSubmit}>
         <div className="section">
           <h2>SMTP Configuration</h2>
@@ -111,19 +122,7 @@ function App() {
           {loading ? 'Sending...' : 'Send Bulk Emails'}
         </button>
       </form>
-
-      {results && (
-        <div className="results">
-          <h2>Results</h2>
-          <ul>
-            {results.map((res, index) => (
-              <li key={index} className={res.status}>
-                {res.email}: {res.status} {res.error && `- ${res.error}`}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+    </div>
     </div>
   )
 }
