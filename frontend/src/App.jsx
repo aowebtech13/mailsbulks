@@ -28,7 +28,8 @@ function App() {
     setLoading(true)
     setStatusMessage(null)
     try {
-      const response = await axios.post('http://localhost:8000/api/send-bulk', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+      const response = await axios.post(`${apiUrl}/send-bulk`, {
         ...formData,
         recipients: formData.recipients.split('\n').map(email => email.trim()).filter(email => email !== '')
       })
