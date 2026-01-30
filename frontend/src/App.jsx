@@ -47,7 +47,7 @@ function App() {
         <img src="https://res.cloudinary.com/djme9spdc/image/upload/v1681139870/samples/ecommerce/leather-bag-gray.jpg" alt="Bulk Mail" />
       </div>
       <div className="container">
-        <h1>Bulk Email Sender (Educational)</h1>
+       
 
         {statusMessage && (
           <div className="section" style={{ backgroundColor: 'var(--light-green)', border: '1px solid var(--primary-green)' }}>
@@ -86,7 +86,7 @@ function App() {
         </div>
 
         <div className="section">
-          <h2>Advanced / Security (Educational)</h2>
+          <h2>Advanced / Security </h2>
           <p>Spoofing is demonstrated by the "From Email" field above. Below you can add custom headers.</p>
           {formData.headers_list.map((header, index) => (
             <div key={index} className="grid" style={{ marginBottom: '10px' }}>

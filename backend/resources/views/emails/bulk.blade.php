@@ -82,7 +82,7 @@
             <tr>
                 <td class="footer">
                     <p>&copy; {{ date('Y') }} Bulk Mail System. All rights reserved.</p>
-                    <p>Educational Purpose Only</p>
+                   
                 </td>
             </tr>
         </table>
