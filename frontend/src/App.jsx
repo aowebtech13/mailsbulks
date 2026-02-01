@@ -4,11 +4,6 @@ import './App.css'
 
 function App() {
   const [formData, setFormData] = useState({
-    smtp_host: '',
-    smtp_port: '587',
-    smtp_user: '',
-    smtp_pass: '',
-    smtp_encryption: 'tls',
     from_email: '',
     subject: '',
     body: '',
@@ -28,8 +23,7 @@ function App() {
     setLoading(true)
     setStatusMessage(null)
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
-      const response = await axios.post(`${apiUrl}/send-bulk`, {
+      const response = await axios.post('/api/send-bulk', {
         ...formData,
         recipients: formData.recipients.split('\n').map(email => email.trim()).filter(email => email !== '')
       })
@@ -56,21 +50,6 @@ function App() {
         )}
 
       <form onSubmit={handleSubmit}>
-        <div className="section">
-          <h2>SMTP Configuration</h2>
-          <div className="grid">
-            <input name="smtp_host" placeholder="SMTP Host" value={formData.smtp_host} onChange={handleChange} required />
-            <input name="smtp_port" placeholder="SMTP Port" value={formData.smtp_port} onChange={handleChange} required />
-            <input name="smtp_user" placeholder="SMTP User" value={formData.smtp_user} onChange={handleChange} required />
-            <input name="smtp_pass" type="password" placeholder="SMTP Password" value={formData.smtp_pass} onChange={handleChange} required />
-            <select name="smtp_encryption" value={formData.smtp_encryption} onChange={handleChange}>
-              <option value="tls">TLS</option>
-              <option value="ssl">SSL</option>
-              <option value="none">None</option>
-            </select>
-          </div>
-        </div>
-
         <div className="section">
           <h2>Email Content</h2>
           <div className="grid">
