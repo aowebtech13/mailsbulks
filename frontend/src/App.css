@@ -213,6 +213,58 @@ button[type="button"] {
 }
 
 /* Custom Header specific styles */
-.grid div {
-  grid-column: span 2;
+/* Status Page Styles */
+.status-page {
+  text-align: center;
+  padding: 40px;
+}
+
+.stats-grid {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.stat-card {
+  padding: 20px;
+  border-radius: 8px;
+  min-width: 120px;
+}
+
+.stat-card h3 {
+  font-size: 2.5rem;
+  margin: 0;
+}
+
+.stat-card.success {
+  background-color: var(--light-green);
+  color: var(--dark-green);
+  border: 1px solid var(--primary-green);
+}
+
+.stat-card.failed {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+.error-list {
+  text-align: left;
+  margin-top: 20px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 15px;
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.error-list h3 {
+  font-size: 1rem;
+  margin-top: 0;
+}
+
+.error-list ul {
+  padding-left: 20px;
+  font-size: 0.9rem;
 }
