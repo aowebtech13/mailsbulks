@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Queue\SerializesModels;
 
 class BulkMail extends Mailable
@@ -51,9 +52,11 @@ class BulkMail extends Mailable
     /**
      * Get the message headers.
      */
-    public function headers(): array
+    public function headers(): Headers
     {
-        return $this->mailData['headers'] ?? [];
+        return new Headers(
+            text: $this->mailData['headers'] ?? [],
+        );
     }
 
     /**

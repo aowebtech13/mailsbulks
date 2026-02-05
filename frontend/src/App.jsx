@@ -8,11 +8,6 @@ function App() {
     subject: '',
     body: '',
     recipients: '',
-    smtp_host: '',
-    smtp_port: '465',
-    smtp_user: '',
-    smtp_pass: '',
-    smtp_encryption: 'ssl',
     headers_list: []
   })
   const [loading, setLoading] = useState(false)
@@ -33,10 +28,7 @@ function App() {
         ...formData,
         recipients: formData.recipients.split('\n').map(email => email.trim()).filter(email => email !== '')
       })
-      alert(response.data.message)
-      // Since Laravel queues emails, we don't get immediate per-email success/fail status
-      // unless we polling or use websockets. For now, just show the queue success message.
-      setResults({ success: formData.recipients.split('\n').length, failed: 0 }) 
+      setResults({ success: formData.recipients.split('\n').filter(e => e.trim()).length, failed: 0 }) 
     } catch (error) {
       alert('Error sending emails: ' + (error.response?.data?.message || error.message))
     } finally {
@@ -51,35 +43,38 @@ function App() {
           <img src="https://res.cloudinary.com/djme9spdc/image/upload/v1681139870/samples/ecommerce/leather-bag-gray.jpg" alt="Bulk Mail" />
         </div>
         <div className="container">
-          <div className="section status-page">
-            <h2 style={{ color: results.failed === 0 ? 'var(--dark-green)' : '#d32f2f' }}>
-              {results.failed === 0 ? '✓ All Emails Sent Successfully' : '⚠ Mailing Process Completed'}
+          <div className="section status-page animate-in">
+            <div className="success-icon-wrapper">
+              <div className="success-icon">✓</div>
+            </div>
+            <h2 className="status-title">
+              Campaign Processed Successfully!
             </h2>
-            <div className="stats-grid">
-              <div className="stat-card success">
-                <h3>{results.success}</h3>
-                <p>Sent</p>
+            <p className="status-subtitle">Your emails have been added to the high-priority queue and are being dispatched.</p>
+            
+            <div className="stats-container">
+              <div className="stat-box">
+                <span className="stat-value">{results.success}</span>
+                <span className="stat-label">Total Recipients</span>
               </div>
-              <div className="stat-card failed">
-                <h3>{results.failed}</h3>
-                <p>Failed</p>
+              <div className="stat-box">
+                <span className="stat-value">Active</span>
+                <span className="stat-label">Queue Status</span>
               </div>
             </div>
 
-            {results.errors && results.errors.length > 0 && (
-              <div className="error-list">
-                <h3>Error Details:</h3>
-                <ul>
-                  {results.errors.map((err, i) => (
-                    <li key={i}><strong>{err.recipient}:</strong> {err.error}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            <div className="info-alert">
+              <p><strong>Note:</strong> Since we use a background worker system, you can safely close this window or start a new campaign while the current one finishes in the background.</p>
+            </div>
 
-            <button onClick={() => setResults(null)} className="btn-success" style={{ marginTop: '20px' }}>
-              Send More Emails
-            </button>
+            <div className="action-buttons">
+              <button onClick={() => setResults(null)} className="btn-primary">
+                Send Another Batch
+              </button>
+              <button onClick={() => window.location.reload()} className="btn-secondary">
+                View History
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -95,21 +90,6 @@ function App() {
        
 
       <form onSubmit={handleSubmit}>
-        <div className="section">
-          <h2>SMTP Configuration (Optional - uses server default if empty)</h2>
-          <div className="grid">
-            <input name="smtp_host" placeholder="SMTP Host (e.g. smtp.gmail.com)" value={formData.smtp_host} onChange={handleChange} />
-            <input name="smtp_port" placeholder="Port (e.g. 465)" value={formData.smtp_port} onChange={handleChange} />
-            <input name="smtp_user" placeholder="SMTP Username" value={formData.smtp_user} onChange={handleChange} />
-            <input name="smtp_pass" type="password" placeholder="SMTP Password" value={formData.smtp_pass} onChange={handleChange} />
-            <select name="smtp_encryption" value={formData.smtp_encryption} onChange={handleChange}>
-              <option value="ssl">SSL</option>
-              <option value="tls">TLS</option>
-              <option value="none">None</option>
-            </select>
-          </div>
-        </div>
-
         <div className="section">
           <h2>Email Content</h2>
           <div className="grid">
