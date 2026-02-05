@@ -61,11 +61,16 @@ class MailController extends Controller
             ];
 
             // Send immediately without background queue
-            SendBulkEmailJob::dispatchSync($recipient, $mailData, $smtpConfig);
+            try {
+                SendBulkEmailJob::dispatchSync($recipient, $mailData, $smtpConfig);
+            } catch (\Exception $e) {
+                // Log the error but continue with the next recipient
+                \Log::error("Failed to send email to {$recipient}: " . $e->getMessage());
+            }
         }
 
         return response()->json([
-            'message' => 'Email sending process started. All emails have been queued.',
+            'message' => 'Email sending process completed.',
             'count' => count($request->recipients)
         ]);
     }
