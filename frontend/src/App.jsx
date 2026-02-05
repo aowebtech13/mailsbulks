@@ -12,6 +12,22 @@ function App() {
   })
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState(null)
+  const [view, setView] = useState('form') // 'form', 'success', 'history'
+  const [history, setHistory] = useState([])
+
+  const fetchHistory = async () => {
+    setLoading(true)
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+      const response = await axios.get(`${apiUrl}/history`)
+      setHistory(response.data)
+      setView('history')
+    } catch (error) {
+      alert('Error fetching history: ' + (error.response?.data?.message || error.message))
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -29,6 +45,7 @@ function App() {
         recipients: formData.recipients.split('\n').map(email => email.trim()).filter(email => email !== '')
       })
       setResults({ success: formData.recipients.split('\n').filter(e => e.trim()).length, failed: 0 }) 
+      setView('success')
     } catch (error) {
       alert('Error sending emails: ' + (error.response?.data?.message || error.message))
     } finally {
@@ -36,7 +53,7 @@ function App() {
     }
   }
 
-  if (results) {
+  if (view === 'success') {
     return (
       <div className="layout-wrapper">
         <div className="side-image">
@@ -55,6 +72,7 @@ function App() {
             <div className="stats-container">
               <div className="stat-box">
                 <span className="stat-value">{results.success}</span>
+                <span className="stat-value">{results.success}</span>
                 <span className="stat-label">Total Recipients</span>
               </div>
               <div className="stat-box">
@@ -68,12 +86,70 @@ function App() {
             </div>
 
             <div className="action-buttons">
-              <button onClick={() => setResults(null)} className="btn-primary">
+              <button onClick={() => setView('form')} className="btn-primary">
                 Send Another Batch
               </button>
-              <button onClick={() => window.location.reload()} className="btn-secondary">
+              <button onClick={fetchHistory} className="btn-secondary">
                 View History
               </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (view === 'history') {
+    return (
+      <div className="layout-wrapper">
+        <div className="side-image">
+          <img src="https://res.cloudinary.com/djme9spdc/image/upload/v1681139870/samples/ecommerce/leather-bag-gray.jpg" alt="Bulk Mail" />
+        </div>
+        <div className="container">
+          <div className="section animate-in">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h2>Mail History</h2>
+              <button onClick={() => setView('form')} className="btn-secondary">Back to Send</button>
+            </div>
+            
+            <div className="history-list">
+              {history.length === 0 ? (
+                <p>No emails sent yet.</p>
+              ) : (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid #eee', textAlign: 'left' }}>
+                        <th style={{ padding: '12px' }}>Recipient</th>
+                        <th style={{ padding: '12px' }}>Subject</th>
+                        <th style={{ padding: '12px' }}>Status</th>
+                        <th style={{ padding: '12px' }}>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {history.map((item) => (
+                        <tr key={item.id} style={{ borderBottom: '1px solid #eee' }}>
+                          <td style={{ padding: '12px' }}>{item.recipient}</td>
+                          <td style={{ padding: '12px' }}>{item.subject}</td>
+                          <td style={{ padding: '12px' }}>
+                            <span style={{ 
+                              padding: '4px 8px', 
+                              borderRadius: '4px', 
+                              fontSize: '0.8em',
+                              backgroundColor: item.status === 'sent' ? '#d4edda' : (item.status === 'failed' ? '#f8d7da' : '#fff3cd'),
+                              color: item.status === 'sent' ? '#155724' : (item.status === 'failed' ? '#721c24' : '#856404')
+                            }}>
+                              {item.status}
+                            </span>
+                            {item.error && <div style={{ fontSize: '0.7em', color: '#721c24', marginTop: '4px' }}>{item.error}</div>}
+                          </td>
+                          <td style={{ padding: '12px' }}>{new Date(item.created_at).toLocaleString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         </div>

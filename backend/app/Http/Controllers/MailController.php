@@ -60,13 +60,19 @@ class MailController extends Controller
                 'id' => $sentEmail->id
             ];
 
-            // Dispatch to queue for efficiency
-            SendBulkEmailJob::dispatch($recipient, $mailData, $smtpConfig);
+            // Send immediately without background queue
+            SendBulkEmailJob::dispatchSync($recipient, $mailData, $smtpConfig);
         }
 
         return response()->json([
             'message' => 'Email sending process started. All emails have been queued.',
             'count' => count($request->recipients)
         ]);
+    }
+
+    public function history()
+    {
+        $history = SentEmail::orderBy('created_at', 'desc')->get();
+        return response()->json($history);
     }
 }
