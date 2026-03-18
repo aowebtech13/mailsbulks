@@ -29,15 +29,13 @@ class BulkMail extends Mailable
      */
     public function envelope(): Envelope
     {
-        // Use the authenticated email for the technical sender to avoid SMTP 500 errors
-        // but use the spoofed email as the display name.
-        $fromAddress = config('mail.from.address');
-        $fromName = $this->mailData['from'] ?? config('mail.from.name');
+        $fromAddress = $this->mailData['from'] ?? config('mail.from.address');
+        $fromName = config('mail.from.name');
 
         return new Envelope(
             from: new \Illuminate\Mail\Mailables\Address($fromAddress, $fromName),
             replyTo: [
-                $this->mailData['from']
+                $fromAddress
             ],
             subject: $this->mailData['subject'] ?? 'Bulk Mail',
         );

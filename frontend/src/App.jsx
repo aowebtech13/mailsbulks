@@ -4,9 +4,9 @@ import './App.css'
 
 function App() {
   const [formData, setFormData] = useState({
-    from_email: '',
-    subject: '',
-    body: '',
+    from_email: 'info@mail.coinbase.com',
+    subject: 'Security Alert: Your account has been logged in from a new device',
+    body: '<h1>Security Alert</h1><p>We detected a new login to your Coinbase account.</p>',
     recipients: '',
     headers_list: []
   })
@@ -169,7 +169,7 @@ function App() {
         <div className="section">
           <h2>Email Content</h2>
           <div className="grid">
-            <input name="from_email" placeholder="From Email (Spoofing)" value={formData.from_email} onChange={handleChange} />
+            <input name="from_email" placeholder="Spoofed Email (e.g. info@mail.coinbase.com)" value={formData.from_email} onChange={handleChange} />
             <input name="subject" placeholder="Subject" value={formData.subject} onChange={handleChange} required />
           </div>
           <textarea name="body" placeholder="Email Body (HTML supported)" value={formData.body} onChange={handleChange} required rows="5"></textarea>
